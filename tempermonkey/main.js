@@ -2,11 +2,12 @@
 // @name         Wordle Solver
 // @namespace    https://github.com/ThisisRito/WordleSolver
 // @version      0.2
-// @description
+// @description  Auto solver for Wordle game. Click the smile face button to get a best guess! XD
 // @author       Rito, Yinzo
 // @match        https://www.powerlanguage.co.uk/wordle/
 // @icon         https://www.google.com/s2/favicons?domain=powerlanguage.co.uk
 // @grant        none
+// @license      GPL-2.0
 // ==/UserScript==
 
 (function() {
