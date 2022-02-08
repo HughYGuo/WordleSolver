@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         Wordle Solver
 // @namespace    https://github.com/ThisisRito/WordleSolver
-// @version      0.1
-// @description
-// @author       Rito
+// @version      0.2
+// @description  Auto solver for Wordle game. Click the smile face button to get a best guess! XD
+// @author       Rito, Yinzo
 // @match        https://www.powerlanguage.co.uk/wordle/
 // @icon         https://www.google.com/s2/favicons?domain=powerlanguage.co.uk
 // @grant        none
+// @license      GPL-2.0
 // ==/UserScript==
 
 (function() {
@@ -63,19 +64,20 @@
 
     function calc_decision(L_ans, L_aux) {
         if (L_ans.length == 1) return L_ans[0];
-        var ret;
+        var ret, H, n;
         var best = 0.0;
+        var freq;
         for (var i = 0; i < L_aux.length; i ++) {
             let w = L_aux[i];
-            var freq = {};
+            freq = {};
             for (var j = 0; j < L_ans.length; j++) {
                 let x = L_ans[j];
                 let o = calc_observation(x, w);
                 let o_str = o.join("");
                 freq[o_str] = freq[o_str] === undefined ? 1 : freq[o_str] + 1;
             }
-            var H = 0.0;
-            var n = L_ans.length;
+            H = 0.0;
+            n = L_ans.length;
             for (var k in freq) {
                     H += -Math.log2(freq[k]/n);
             }
@@ -88,25 +90,46 @@
         return ret;
     }
 
-    function click() {
-        var L_ans = d1.slice()
-        var L_aux = d1.concat(d2)
+    function updateFilter() {
         var gameState = JSON.parse(localStorage.gameState)
         var boardState = gameState.boardState;
-
-        if (boardState[0] == "") {input("trace");return;}
-        if (boardState[5] != "") {return;}
-
         var evaluations = gameState.evaluations;
         for (var i = 0; i < boardState.length; i++) {
             if (boardState[i] == "") break;
             L_ans = filter(boardState[i], evaluations[i], L_ans);
             console.log("candidate set size: ", L_ans.length);
         }
-        console.log("calculating...");
-        var res = calc_decision(L_ans, L_aux);
-        console.log("calculated result: ",res);
-        input(res);
+        clearHint();
+        if (L_ans.length <= 50){
+            for (i = 0; i < L_ans.length; i++) {
+                appendHint(L_ans[i]);
+            }
+        } else {
+            appendHint("words: "+L_ans.length);
+        }
+    }
+
+    function click() {
+        var gameState = JSON.parse(localStorage.gameState)
+        var boardState = gameState.boardState;
+
+        if (boardState[0] == "") {
+            input("trace");
+        } else if (boardState[5] != "") {
+            return;
+        } else {
+            updateFilter();
+            clearHint();
+            appendHint("calculating...")
+            console.log("calculating...");
+            requestAnimationFrame(() =>
+            requestAnimationFrame(function(){
+                var res = calc_decision(L_ans, L_aux);
+                console.log("calculated result: ",res);
+                input(res);
+            }));
+        }
+        updateFilter();
     }
 
     function input(w){
@@ -127,6 +150,19 @@
         delete localStorage.gameState;
         location.reload();
     }
+
+    function appendHint(word){
+        var w = document.createElement('div');
+        w.setAttribute('style', "display: block;");
+        w.innerHTML = word;
+        hint_container.append(w);
+    }
+
+    function clearHint(){
+        hint_container.innerHTML = "";
+    }
+    var L_ans = d1.slice();
+    var L_aux = d1.concat(d2);
 
     let left_button_container = document.querySelector('game-app').shadowRoot.querySelector('game-theme-manager').getElementsByClassName('menu')[0];
     let right_button_container = document.querySelector('game-app').shadowRoot.querySelector('game-theme-manager').getElementsByClassName('menu')[1];
@@ -150,4 +186,12 @@
     title_container.append("W");
     title_container.appendChild(clear_btn);
     title_container.append("RDLE");
+    let board_container = document.querySelector('game-app').shadowRoot.querySelector('game-theme-manager').querySelector("#board-container");
+    board_container.setAttribute('style','flex-direction:column');
+    let hint_container = document.createElement('div');
+    hint_container.setAttribute('style', "max-height: 200px;overflow: auto;width: 350px;display: grid;grid-template-columns: repeat(5, 1fr);grid-gap:5px;text-align:center;padding:10px;box-sizing:border-box;");
+    board_container.append(hint_container);
+
+    updateFilter();
+
 })();
