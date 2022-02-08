@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Wordle Solver
 // @namespace    https://github.com/ThisisRito/WordleSolver
-// @version      0.2.1
+// @version      0.2.2
 // @description  Auto solver for Wordle game. Click the smile face button to get a best guess! XD
 // @author       Rito, Yinzo
 // @match        https://www.powerlanguage.co.uk/wordle/
@@ -157,15 +157,25 @@
     }
 
     function updateHint() {
+        var i;
         clearHint()
-        if (L_ans.length <= 50){
-            for (var i = 0; i < L_ans.length; i++) {
+        if (L_ans.length <= 30){
+            for (i = 0; i < L_ans.length; i++) {
                 appendHint(L_ans[i]);
             }
         } else {
-            appendHint("words: "+L_ans.length);
-        }
+            appendHint("");
+            appendHint("remaining");
+            appendHint("words:");
+            appendHint(L_ans.length);
+            appendHint("");
 
+            const shuffled = L_ans.sort(() => 0.5 - Math.random());
+            for (i = 0; i < 24; i++) {
+                appendHint(shuffled[i]);
+            }
+            appendHint("...");
+        }
     }
 
     var L_ans = d1.slice();
@@ -199,7 +209,7 @@
     let board_container = document.querySelector('game-app').shadowRoot.querySelector('game-theme-manager').querySelector("#board-container");
     board_container.setAttribute('style','flex-direction:column');
     let hint_container = document.createElement('div');
-    hint_container.setAttribute('style', "max-height: 200px;overflow: auto;width: 350px;display: grid;grid-template-columns: repeat(5, 1fr);grid-gap:5px;text-align:center;padding:10px;box-sizing:border-box;");
+    hint_container.setAttribute('style', "max-height: 200px;overflow: auto;width: 350px;display: grid;grid-template-columns: repeat(5, 1fr);grid-gap:5px;text-align:center;padding:10px;box-sizing:border-box;font-family: consolas;");
     board_container.append(hint_container);
 
     updateFilter();
