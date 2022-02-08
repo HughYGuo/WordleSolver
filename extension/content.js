@@ -79,7 +79,6 @@ let d1 = ["cigar", "rebut", "sissy", "humph", "awake", "blush", "focal", "evade"
     function updateFilter() {
 
         var gameState = JSON.parse(localStorage.gameState);
-        console.log(gameState);
         var boardState = gameState.boardState;
         var evaluations = gameState.evaluations;
         for (var i = 0; i < boardState.length; i++) {
@@ -144,7 +143,6 @@ let d1 = ["cigar", "rebut", "sissy", "humph", "awake", "blush", "focal", "evade"
     }
 
     function updateHint() {
-        console.log("in updateHint");
         clearHint()
         if (L_ans.length <= 50){
             for (var i = 0; i < L_ans.length; i++) {
@@ -193,6 +191,5 @@ let d1 = ["cigar", "rebut", "sissy", "humph", "awake", "blush", "focal", "evade"
     updateFilter();
     keyboardRoot.querySelector('button[data-key="↵"]').onclick = function(){setTimeout(updateFilter, 2000)};
     window.addEventListener('keydown', function(event){
-        console.log('enter pressed');
         if (event.key === "Enter") setTimeout(updateFilter, 2000);
     })
