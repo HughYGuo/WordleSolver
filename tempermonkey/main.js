@@ -8,6 +8,9 @@
 // @icon         https://www.google.com/s2/favicons?domain=powerlanguage.co.uk
 // @grant        none
 // @license      GPL-2.0
+// @updateURL    https://raw.githubusercontent.com/ThisisRito/WordleSolver/main/tempermonkey/main.js
+// @downloadURL  https://raw.githubusercontent.com/ThisisRito/WordleSolver/main/tempermonkey/main.js
+// @supportURL   https://github.com/ThisisRito/WordleSolver/issues
 // ==/UserScript==
 
 (function() {
