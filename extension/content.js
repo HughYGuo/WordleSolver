@@ -77,7 +77,8 @@ let d1 = ["cigar", "rebut", "sissy", "humph", "awake", "blush", "focal", "evade"
     }
 
     function updateFilter() {
-        var gameState = JSON.parse(localStorage.gameState)
+
+        var gameState = JSON.parse(localStorage.gameState);
         var boardState = gameState.boardState;
         var evaluations = gameState.evaluations;
         for (var i = 0; i < boardState.length; i++) {
@@ -85,14 +86,7 @@ let d1 = ["cigar", "rebut", "sissy", "humph", "awake", "blush", "focal", "evade"
             L_ans = filter(boardState[i], evaluations[i], L_ans);
             console.log("candidate set size: ", L_ans.length);
         }
-        clearHint();
-        if (L_ans.length <= 50){
-            for (i = 0; i < L_ans.length; i++) {
-                appendHint(L_ans[i]);
-            }
-        } else {
-            appendHint("words: "+L_ans.length);
-        }
+        updateHint();
     }
 
     function click() {
@@ -147,8 +141,34 @@ let d1 = ["cigar", "rebut", "sissy", "humph", "awake", "blush", "focal", "evade"
     function clearHint(){
         hint_container.innerHTML = "";
     }
+
+    function updateHint() {
+        var i;
+        clearHint()
+        if (L_ans.length <= 30){
+            for (i = 0; i < L_ans.length; i++) {
+                appendHint(L_ans[i]);
+            }
+        } else {
+            appendHint("");
+            appendHint("remaining");
+            appendHint("words:");
+            appendHint(L_ans.length);
+            appendHint("");
+
+            const shuffled = L_ans.sort(() => 0.5 - Math.random());
+            for (i = 0; i < 24; i++) {
+                appendHint(shuffled[i]);
+            }
+            appendHint("...");
+        }
+    }
+
     var L_ans = d1.slice();
     var L_aux = d1.concat(d2);
+    const app = document.querySelector('game-app');
+    const keyboard = app.shadowRoot.querySelector('game-keyboard');
+    const keyboardRoot = keyboard.shadowRoot;
 
     let left_button_container = document.querySelector('game-app').shadowRoot.querySelector('game-theme-manager').getElementsByClassName('menu')[0];
     let right_button_container = document.querySelector('game-app').shadowRoot.querySelector('game-theme-manager').getElementsByClassName('menu')[1];
@@ -175,7 +195,11 @@ let d1 = ["cigar", "rebut", "sissy", "humph", "awake", "blush", "focal", "evade"
     let board_container = document.querySelector('game-app').shadowRoot.querySelector('game-theme-manager').querySelector("#board-container");
     board_container.setAttribute('style','flex-direction:column');
     let hint_container = document.createElement('div');
-    hint_container.setAttribute('style', "max-height: 200px;overflow: auto;width: 350px;display: grid;grid-template-columns: repeat(5, 1fr);grid-gap:5px;text-align:center;padding:10px;box-sizing:border-box;");
+    hint_container.setAttribute('style', "max-height: 200px;overflow: auto;width: 350px;display: grid;grid-template-columns: repeat(5, 1fr);grid-gap:5px;text-align:center;padding:10px;box-sizing:border-box;font-family: consolas;");
     board_container.append(hint_container);
 
     updateFilter();
+    keyboardRoot.querySelector('button[data-key="↵"]').onclick = function(){setTimeout(updateFilter, 2000)};
+    window.addEventListener('keydown', function(event){
+        if (event.key === "Enter") setTimeout(updateFilter, 2000);
+    })
